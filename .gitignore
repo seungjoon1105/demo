@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local secrets and database files
+application-secret.properties
+data/

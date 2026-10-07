@@ -13,4 +13,10 @@ public class TestDB {
 
     @Column(nullable = true) // 테이블의 컬럼 설정 값을 명시
     private String name;
+
+    @Column(nullable = true) // 4주차 32쪽 연습문제: 나이
+    private Integer age;
+
+    @Column(nullable = true) // 4주차 32쪽 연습문제: 성별
+    private String gender;
 }

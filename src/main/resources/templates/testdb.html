@@ -8,9 +8,17 @@
 <body>
     <h1>User List</h1>
     <table border="1">
+        <tr>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>나이</th>
+            <th>성별</th>
+        </tr>
         <tr th:each="user : ${users}">
             <td th:text="${user.id}"></td>
             <td th:text="${user.name}"></td>
+            <td th:text="${user.age}"></td>
+            <td th:text="${user.gender}"></td>
         </tr>
     </table>
 </body>
