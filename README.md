@@ -2,6 +2,23 @@
 
 4주차 MySQL 연동·사용자 정보 출력, 5주차 로그인·로그아웃·BCrypt 암호화와 6주차 권한(ROLE) 접근 제어·관리자 페이지를 구현했습니다. 각 주차 연습문제도 포함합니다. 프로젝트 설명과 실행·실습 안내는 이 README.md에서 관리합니다.
 
+## 2026-10-20 실행 오류 수정
+
+Docker Desktop이 꺼져 있어 MySQL 연결이 거부되었고, 이어서 Hibernate의 `Unable to determine Dialect without JDBC metadata` 오류가 발생했습니다. Docker와 기존 `mysql-server`를 실행하여 실제 MySQL 연결과 서버 시작을 확인했습니다.
+
+현재 [로그인 화면](http://localhost:8080/login)에서 아래 계정으로 로그인할 수 있습니다. 가입 기능으로 BCrypt 비밀번호를 저장하고, 제공 자료의 UPDATE 문으로 admin 권한을 적용했습니다.
+
+| 아이디 | 비밀번호 | 권한 |
+| --- | --- | --- |
+| student1 | 123123 | USER |
+| admin | 1234 | ADMIN |
+
+VS Code의 실행 및 디버그에서 `Spring Boot-DemoApplication<demo>`를 실행하면 `수업 MySQL 준비` 작업이 Docker 시작, 기존 컨테이너 시작, MySQL 응답 확인을 먼저 수행합니다. 프로젝트 상위 폴더 또는 demo 폴더를 열었을 때 모두 적용됩니다. 사용하지 않는 `.env` 참조도 제거했습니다. 기존 컨테이너의 재시작 정책은 `unless-stopped`로 설정했습니다.
+
+터미널에서 직접 실행할 때는 MySQL이 준비된 뒤 demo 폴더에서 `./mvnw spring-boot:run`을 실행합니다. 이미 서버가 실행 중이면 추가 실행 전에 기존 서버를 종료해야 합니다.
+
+검증: `./mvnw -o verify`의 테스트 16개 통과. 실제 MySQL 환경에서도 두 계정 로그인, 내 정보, USER의 관리자·testdb 접근 403, ADMIN 접근 성공, 로그아웃을 확인했습니다. 아래 2026-10-07의 MySQL 미검증 기록은 이 검증으로 갱신되었습니다.
+
 ## 확인한 수업 자료
 
 - `4주차 데이터베이스 연동 및 테스트(수정됨).pdf`: 1~33쪽 전체.
