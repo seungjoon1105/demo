@@ -6,6 +6,8 @@
 - GitHub 저장소: [seungjoon1105/demo](https://github.com/seungjoon1105/demo)
 - Java 25 · Spring Boot 4.1.1 · MySQL 8 · Thymeleaf · Spring Security
 
+**[7주차 실습 내용 바로가기](#week7)** · [실행 방법](#실행) · [테스트](#테스트)
+
 ## 진행 현황
 
 - 1주차 - 스프링 부트 개발환경 설정 완료
@@ -14,7 +16,6 @@
 - 4주차 - 데이터베이스 수정 완료 (MySQL + JPA 연동, `/testdb` 사용자 목록 출력)
 - 5주차 - 로그인/로그아웃, 암호화 완료 + 연습문제(로그인 상태 유지, 비밀번호 확인)
 - 6주차 - 권한(ROLE) 접근 제어, 관리자 페이지 분리 완료 + 연습문제(관리자 본인 보호, MANAGER 권한)
-
 - 7주차 - 회원 관리 REST API(JSON) 완료 + 연습문제(회원 검색, 공통 오류 처리)
 
 ## 2주차 - 개발환경 설정 및 테스트
@@ -76,14 +77,14 @@
 
 ### 4주차 SQL 실습
 
-PDF 27쪽의 최초 입력 SQL입니다. 기존 `id=1` 데이터가 있으면 중복 실행하지 않습니다.
+수업 자료의 최초 입력 SQL입니다. 기존 `id=1` 데이터가 있으면 중복 실행하지 않습니다.
 
 ```sql
 insert into testdb (id, name)
 values (1, '홍길동');
 ```
 
-32쪽 연습문제는 나이·성별을 추가하고 MySQL 확장에서 직접 입력하는 과제입니다. 해당 페이지는 INSERT 문 전문 대신 결과 표를 제공합니다.
+연습문제는 나이·성별을 추가하고 MySQL 확장에서 직접 입력하는 과제입니다. 수업 자료의 결과 표는 다음과 같습니다.
 
 | 아이디 | 이름 | 나이 | 성별 |
 | --- | --- | --- | --- |
@@ -138,7 +139,7 @@ values (1, '홍길동');
 
 ### 관리자 계정 준비
 
-다른 DB에서 처음 준비할 때는 `/signup`에서 `admin / 1234 / 관리자`로 가입한 뒤, 교수님 제공 SQL을 실행합니다.
+다른 DB에서 처음 준비할 때는 `/signup`에서 아이디 `admin`, 이름 `관리자`와 본인이 정한 비밀번호로 가입한 뒤, 교수님 제공 SQL을 실행합니다.
 
 ```sql
 SELECT id, username, name, role FROM member;
@@ -164,23 +165,25 @@ SELECT id, username, name, role FROM member;
 
 `/testdb`는 TestDB 테이블 목록이며, `/admin/members`는 로그인 회원을 관리하는 Member 테이블 목록입니다.
 
+<a id="week7"></a>
+
 ## 7주차 - REST API와 JSON
 
-7주차 회원 관리 REST API(JSON) 완료. PDF 11~28쪽 실습과 32쪽 연습문제를 반영했습니다.
+7주차 회원 관리 REST API(JSON) 실습과 연습문제를 완료했습니다.
 
-14쪽까지 작성한 `MemberApiController`, `MemberResponse`와 한글 UTF-8·JSON 정렬 설정은 유지하고, 이후 실습을 추가했습니다. API 회원 관리 화면은 교수님 제공 원본을 사용하고, 기존 회원 관리 화면에는 제공된 링크만 추가했습니다.
+`MemberApiController`와 `MemberResponse`로 JSON 응답을 구성하고, Basic 인증과 관리자 회원 관리 API를 구현했습니다. 한글 UTF-8·JSON 정렬 설정을 적용하고, 교수님 제공 화면을 연결했습니다.
 
-| PDF | 구현 내용 | 관련 파일 |
+| 실습 항목 | 구현 내용 | 관련 파일 |
 | --- | --- | --- |
-| 11~14쪽 | 첫 JSON API, 로그인 회원 정보, 비밀번호를 제외한 응답 DTO | [MemberApiController.java](src/main/java/com/example/demo/controller/MemberApiController.java), [MemberResponse.java](src/main/java/com/example/demo/model/dto/MemberResponse.java) |
-| 15~18쪽 | No Auth 확인 후 Basic 인증 추가, API 비로그인 401, `/api/**` CSRF 제외 | [SecurityConfig.java](src/main/java/com/example/demo/config/SecurityConfig.java) |
-| 21~24쪽 | 관리자 목록·단건 조회·등록, 필수값 검사, 201과 Location | [AdminApiController.java](src/main/java/com/example/demo/controller/AdminApiController.java), [MemberService.java](src/main/java/com/example/demo/model/service/MemberService.java) |
-| 25~27쪽 | RoleRequest, 권한 변경 200, 삭제 204, 서비스 검사 재사용 | [RoleRequest.java](src/main/java/com/example/demo/model/dto/RoleRequest.java) |
-| 28쪽 | `/admin/members-api` 화면 연결, fetch 요청·응답 기록 | [AdminController.java](src/main/java/com/example/demo/controller/AdminController.java), [members-api.html](src/main/resources/templates/admin/members-api.html) |
-| 32쪽 ① | 아이디 또는 이름 부분 검색, `?keyword=student` | [MemberRepository.java](src/main/java/com/example/demo/model/repository/MemberRepository.java) |
-| 32쪽 ② | 반복되는 IllegalArgumentException 처리를 한 곳으로 이동, 동일한 400 오류 JSON | [ApiExceptionHandler.java](src/main/java/com/example/demo/controller/ApiExceptionHandler.java) |
+| 첫 API와 응답 DTO | 첫 JSON API, 로그인 회원 정보, 비밀번호를 제외한 응답 DTO | [MemberApiController.java](src/main/java/com/example/demo/controller/MemberApiController.java), [MemberResponse.java](src/main/java/com/example/demo/model/dto/MemberResponse.java) |
+| API 인증 설정 | No Auth 확인 후 Basic 인증 추가, API 비로그인 401, `/api/**` CSRF 제외 | [SecurityConfig.java](src/main/java/com/example/demo/config/SecurityConfig.java) |
+| 관리자 조회·등록 | 관리자 목록·단건 조회·등록, 필수값 검사, 201과 Location | [AdminApiController.java](src/main/java/com/example/demo/controller/AdminApiController.java), [MemberService.java](src/main/java/com/example/demo/model/service/MemberService.java) |
+| 권한 변경·삭제 | RoleRequest, 권한 변경 200, 삭제 204, 서비스 검사 재사용 | [RoleRequest.java](src/main/java/com/example/demo/model/dto/RoleRequest.java) |
+| API 화면 연결 | `/admin/members-api` 화면 연결, fetch 요청·응답 기록 | [AdminController.java](src/main/java/com/example/demo/controller/AdminController.java), [members-api.html](src/main/resources/templates/admin/members-api.html) |
+| 연습문제: 회원 검색 | 아이디 또는 이름 부분 검색, `?keyword=student` | [MemberRepository.java](src/main/java/com/example/demo/model/repository/MemberRepository.java) |
+| 연습문제: 공통 오류 처리 | 반복되는 IllegalArgumentException 처리를 한 곳으로 이동, 동일한 400 오류 JSON | [ApiExceptionHandler.java](src/main/java/com/example/demo/controller/ApiExceptionHandler.java) |
 
-32쪽은 완성 코드 대신 구현 힌트를 제공하는 연습문제입니다. `@RequestParam(required = false)`, `findByUsernameContainingOrNameContaining`, `@RestControllerAdvice`와 `@ExceptionHandler(IllegalArgumentException.class)`로 구현했습니다. 공통 오류 처리는 관리자 API에만 적용하여 기존 HTML 화면의 오류 안내를 유지합니다.
+연습문제는 수업 자료의 구현 힌트를 바탕으로 작성했습니다. `@RequestParam(required = false)`, `findByUsernameContainingOrNameContaining`, `@RestControllerAdvice`와 `@ExceptionHandler(IllegalArgumentException.class)`로 구현했습니다. 공통 오류 처리는 관리자 API에만 적용하여 기존 HTML 화면의 오류 안내를 유지합니다.
 
 ### API 주소와 결과
 
@@ -209,17 +212,38 @@ SELECT id, username, name, role FROM member;
 4. API 화면에서 검색, 회원 등록, 권한 변경, 삭제, 9999번 조회를 실행하고 오른쪽 HTTP 기록의 상태 코드를 확인합니다.
 5. Postman 등 외부 클라이언트에서는 Basic Auth에 기존 실습 계정과 비밀번호를 지정합니다. JSON 요청 본문은 `Content-Type: application/json`으로 전송합니다.
 
-기존 계정은 `student1 / 123123`, `admin / 1234`를 유지했습니다. PDF 18·27쪽의 `student1 / 1234` 예시는 본인 DB의 비밀번호에 맞춰 `123123`을 사용합니다. 회원 ID도 DB의 실제 번호를 사용합니다.
+실습 계정은 `student1`과 `admin`을 사용합니다. 비밀번호는 본인 DB에 가입한 값을 입력하고, 회원 ID도 DB의 실제 번호를 사용합니다.
 
-15·16쪽의 중간 단계에서는 No Auth 요청이 302로 로그인 화면에 이동하지만, 18쪽을 완료한 최종 코드에서는 `/api/me`의 No Auth 요청이 **401, 본문 없음**입니다. Basic 비밀번호 오류도 401이며, 로그인된 브라우저의 세션 요청은 200입니다. HTML 화면은 브라우저 요청(`Accept: text/html`)일 때 기존처럼 로그인 화면으로 이동합니다.
+API 인증 설정 전에는 No Auth 요청이 302로 로그인 화면에 이동하지만, 최종 코드에서는 `/api/me`의 No Auth 요청이 **401, 본문 없음**입니다. Basic 비밀번호 오류도 401이며, 로그인된 브라우저의 세션 요청은 200입니다. HTML 화면은 브라우저 요청(`Accept: text/html`)일 때 기존처럼 로그인 화면으로 이동합니다.
+
+### Postman 실습
+
+공식 Postman 데스크톱 앱을 설치하고 **Continue without an account → Open Lightweight API Client**로 실행했습니다. 직접 URL을 입력하는 방식으로 실습했으며, 요청 기록은 Postman의 History에서 확인할 수 있습니다.
+
+| 실습 단계 | 요청 및 설정 | 직접 확인한 결과 |
+| --- | --- | --- |
+| 첫 API 요청 | GET `http://localhost:8080/api/hello`, Authorization: **No Auth** | **200 OK**, `message`와 `time` JSON, 정상 한글 |
+| 인증 설정 전 | GET `http://localhost:8080/api/me`, **No Auth**, 자동 리다이렉트 켬 | 로그인 화면으로 이동 후 **200 OK**, Body에 로그인 **HTML** |
+| 리다이렉트 확인 | 같은 요청에서 **Automatically follow redirects** 끔 | **302 Found**, `Location: http://localhost:8080/login` |
+| 인증 설정 완료 후 | 완성된 보안 설정 복구 후 `/api/me`를 **No Auth**로 요청 | **401 Unauthorized**, 본문 없음 |
+
+인증 설정 전의 로그인 HTML은 오류가 아니라 인증되지 않은 요청을 로그인 페이지로 보내는 중간 단계 결과입니다. 해당 결과를 재현한 뒤 완성된 보안 설정으로 복구했습니다. **현재 코드에서는 No Auth에 401이 나오는 것이 정상**입니다.
+
+최종 상태에서 회원 정보를 조회하려면 Authorization을 **Basic Auth**로 선택합니다.
+
+| 요청 주소 | Username | Password | 기대 결과 |
+| --- | --- | --- | --- |
+| `http://localhost:8080/api/me` | student1 | 가입 시 설정한 비밀번호 | 200, 본인 정보 JSON, password 제외 |
+| `http://localhost:8080/api/admin/members` | admin | 가입 시 설정한 비밀번호 | 200, 회원 목록 JSON |
+| `http://localhost:8080/api/admin/members` | student1 | 가입 시 설정한 비밀번호 | 403, 관리자 권한 없음 |
 
 ### 등록 요청 예시
 
 ```json
 {
   "username": "postman1",
-  "password": "1234",
-  "passwordConfirm": "1234",
+  "password": "가입할_비밀번호",
+  "passwordConfirm": "가입할_비밀번호",
   "name": "포스트맨"
 }
 ```
@@ -230,7 +254,11 @@ SELECT id, username, name, role FROM member;
 
 2026-10-21: `./mvnw -o verify`의 기존 테스트 16개 통과. Basic 인증 추가 후 브라우저 동작을 검증하는 두 테스트 클래스에는 `Accept: text/html`을 명시했습니다.
 
-실제 MySQL에서 HTTP 요청 34건으로 No Auth·Basic 인증 성공/실패, 비밀번호 제외, 목록·단건·검색, 201과 Location, 중복·필수값·확인 불일치 400, 권한 변경 200, 본인 보호 400, USER·MANAGER 403, 삭제 204를 확인했습니다. 초기에는 Postman 앱이 없어 동일한 HTTP 요청으로 검증했습니다. 이후 공식 Postman 데스크톱 앱을 설치하고 가입 없이 15·16쪽 실습을 직접 실행했습니다. GET /api/hello의 No Auth 요청은 200 JSON, 18쪽 이전 임시 실행 상태의 GET /api/me는 302와 Location: /login, 자동 이동 시 200 로그인 HTML을 확인했습니다. 확인 후 원래 보안 설정을 복구했고, 최종 서버의 No Auth /api/me는 다시 401임을 Postman에서 확인했습니다. 기존 student1·admin 계정은 유지하고 검증용 회원만 등록·삭제했습니다. 실제 브라우저에서도 제공 화면의 검색·등록 201·변경 200·삭제 204·없는 번호 404·빈칸 400, 새로고침 0회와 JavaScript 오류 0건을 확인했습니다.
+- 실제 MySQL API 요청 **34건 통과**: 인증, 비밀번호 제외, 조회·검색·등록·권한 변경·삭제, 오류 상태 코드 확인.
+- 실제 Postman 앱에서 **요청 직접 실행**: 200 JSON, 302와 Location 헤더, 로그인 HTML 확인. 최종 설정 복구 후 No Auth 401 재확인.
+- 실제 브라우저에서 **검색·등록 201·변경 200·삭제 204·없는 번호 404·빈칸 400** 확인.
+- 화면 작업 중 **페이지 새로고침 0회, JavaScript 오류 0건** 확인.
+- 기존 student1·admin 계정과 권한 유지. 검증용 회원만 등록·삭제.
 
 ## 프로젝트 구조
 
@@ -303,8 +331,8 @@ Windows에서는 다음 명령을 사용합니다.
 
 | 아이디 | 비밀번호 | 권한 |
 | --- | --- | --- |
-| student1 | 123123 | USER |
-| admin | 1234 | ADMIN |
+| student1 | 가입 시 설정한 비밀번호 | USER |
+| admin | 가입 시 설정한 비밀번호 | ADMIN |
 
 [로그인](http://localhost:8080/login) · [회원가입](http://localhost:8080/signup) · [내 정보](http://localhost:8080/mypage) · [회원 관리](http://localhost:8080/admin/members)
 
