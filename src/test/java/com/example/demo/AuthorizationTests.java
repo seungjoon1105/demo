@@ -36,7 +36,9 @@ class AuthorizationTests {
     Member admin, student;
 
     @BeforeEach void setup() {
-        mvc = MockMvcBuilders.webAppContextSetup(context).addFilters(security).build();
+        mvc = MockMvcBuilders.webAppContextSetup(context)
+            .defaultRequest(get("/").accept(org.springframework.http.MediaType.TEXT_HTML))
+            .addFilters(security).build();
         admin = member("authadmin", "ADMIN");
         student = member("authstudent", "USER");
     }

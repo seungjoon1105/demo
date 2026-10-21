@@ -26,7 +26,9 @@ class LoginFlowTests {
     @Autowired com.example.demo.model.repository.MemberRepository members;
     MockMvc mvc;
     @BeforeEach void setup() {
-        mvc = MockMvcBuilders.webAppContextSetup(context).addFilters(security).build();
+        mvc = MockMvcBuilders.webAppContextSetup(context)
+            .defaultRequest(get("/").accept(org.springframework.http.MediaType.TEXT_HTML))
+            .addFilters(security).build();
     }
     private String csrf(MvcResult page) throws Exception {
         var match = java.util.regex.Pattern.compile("name=\"_csrf\"[^>]*value=\"([^\"]+)\"")

@@ -1,6 +1,7 @@
 package com.example.demo.model.service;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,9 @@ public class MemberService implements UserDetailsService {
     private static final List<String> ROLES = List.of("USER", "MANAGER", "ADMIN");
 
     public Member signup(MemberForm form) {
+        if (isBlank(form.getUsername()) || isBlank(form.getPassword()) || isBlank(form.getName())) {
+            throw new IllegalArgumentException("아이디, 비밀번호, 이름은 필수입니다.");
+        }
         if (memberRepository.existsByUsername(form.getUsername())) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
@@ -58,8 +62,21 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findAll(Sort.by("id"));
     }
 
+    // [7주차] 회원 1명 조회
+    public Optional<Member> findById(Long id) {
+        return memberRepository.findById(id);
+    }
+
+    // [7주차 연습문제] 아이디 또는 이름 검색
+    public List<Member> search(String keyword) {
+        if (isBlank(keyword)) {
+            return findAll();
+        }
+        return memberRepository.findByUsernameContainingOrNameContaining(keyword, keyword);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
-    public void changeRole(Long id, String role) {
+    public Member changeRole(Long id, String role) {
         if (!ROLES.contains(role)) {
             throw new IllegalArgumentException("허용되지 않는 권한입니다 : " + role);
         }
@@ -71,7 +88,7 @@ public class MemberService implements UserDetailsService {
             throw new IllegalArgumentException("자기 자신의 권한 변경·삭제는 할 수 없습니다.");
         }
         member.setRole(role);
-        memberRepository.save(member);
+        return memberRepository.save(member);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -85,4 +102,5 @@ public class MemberService implements UserDetailsService {
         }
         memberRepository.delete(member);
     }
+    private boolean isBlank(String value) { return value == null || value.isBlank(); }
 }

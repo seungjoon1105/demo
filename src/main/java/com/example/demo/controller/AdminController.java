@@ -22,6 +22,11 @@ public class AdminController {
         return "admin/members";
     }
 
+    @GetMapping("/members-api") // JSON API를 fetch로 사용하는 회원 관리 화면
+    public String membersApi() {
+        return "admin/members-api";
+    }
+
     @PostMapping("/members/{id}/role")
     public String changeRole(@PathVariable Long id, @RequestParam String role, RedirectAttributes redirect) {
         try {

@@ -3,6 +3,9 @@ package com.example.demo.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,8 +32,10 @@ public class SecurityConfig {
                 .requestMatchers("/", "/hello", "/detailed_web.html",
                     "/login", "/signup", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/fonts/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN") // [6주차] 관리자만
+                .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN") // [6주차] 관리자만
                 .requestMatchers("/testdb").hasAnyRole("ADMIN", "MANAGER") // [6주차 연습문제]
+                .requestMatchers("/api/hello").permitAll()
+                .requestMatchers("/api/me").authenticated() // [6주차] 내 정보 API
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginPage("/login")
@@ -44,7 +49,13 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID", "remember-me"))
             .rememberMe(remember -> remember // [5주차 연습문제] 로그인 상태 유지
                 .key(rememberMeKey)
-                .tokenValiditySeconds(7 * 24 * 60 * 60));
+                .tokenValiditySeconds(7 * 24 * 60 * 60))
+            // [7주차] REST API 설정
+            .httpBasic(Customizer.withDefaults())
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+            .exceptionHandling(ex -> ex.defaultAuthenticationEntryPointFor(
+                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                request -> request.getRequestURI().startsWith("/api/")));
         return http.build();
     }
 }
